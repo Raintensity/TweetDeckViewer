@@ -24,3 +24,19 @@ window.addEventListener("contextmenu",e=>{
 	menu.append(new MenuItem({label:"コンソール (&C)",role:"toggledevtools"}));
 	menu.popup(remote.getCurrentWindow());
 });
+
+window.addEventListener("DOMContentLoaded",()=>{
+	var observer=new MutationObserver(recs=>{
+		recs.forEach(rec=>{
+			rec.addedNodes.forEach(node=>{
+				if(node.nodeType!==1)return;
+				var elems=node.querySelectorAll("[data-full-url]");
+				elems.forEach(elem=>{
+					if(!elem.href||!elem.href.indexOf("://t.co")<0)return;
+					elem.href=elem.dataset.fullUrl;
+				});
+			});
+		});
+	});
+	observer.observe(window.document,{childList:true,subtree:true});
+});

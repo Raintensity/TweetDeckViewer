@@ -7,7 +7,7 @@ app.on("ready",()=>{
 		title:"TweetDeck",
 		webPreferences:{
 			nodeIntegration:false,
-            preload:__dirname+"/preload.js"
+			preload:__dirname+"/preload.js"
 		}
 	});
 	win.setMenu(null);
@@ -26,7 +26,9 @@ app.on("ready",()=>{
 	});
 	win.webContents.on("did-get-redirect-request",(e,o,n,w,c,m,r,h)=>{
 		if(w){
-			setTimeout(()=>win.webContents.send("redirect-url",n),10);
+			setTimeout(()=>{
+				win.webContents.send("redirect-url",n);
+			},10);
 			e.preventDefault();
 		}
 	});
