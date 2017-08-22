@@ -40,3 +40,10 @@ window.addEventListener("DOMContentLoaded",()=>{
 	});
 	observer.observe(window.document,{childList:true,subtree:true});
 });
+
+window.addEventListener("keydown",e=>{
+	if(e.keyCode!=116)return;
+	e.preventDefault();
+	if(e.ctrlKey)ipcRenderer.send("reload-super");
+	else ipcRenderer.send("reload-normal");
+});

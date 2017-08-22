@@ -1,5 +1,5 @@
 const electron=require("electron");
-const {app,shell,globalShortcut}=electron;
+const {app,shell,ipcMain}=electron;
 
 let win;
 app.on("ready",()=>{
@@ -14,28 +14,27 @@ app.on("ready",()=>{
 	win.on("closed",()=>{
 		win=null;
 	});
-	globalShortcut.register("F5",()=>{
+	ipcMain.on("reload-normal",()=>{
 		win.webContents.reload();
 	});
-	globalShortcut.register("CommandOrControl+F5",()=>{
+	ipcMain.on("reload-super",()=>{
 		win.webContents.reloadIgnoringCache();
 	});
-	win.loadURL("https://tweetdeck.twitter.com/");
 	win.webContents.on("did-finish-load",()=>{
 		win.webContents.insertCSS("::-webkit-scrollbar{width:4px!important;height:4px!important;}");
 	});
 	win.webContents.on("did-get-redirect-request",(e,o,n,w,c,m,r,h)=>{
-		if(w){
-			setTimeout(()=>{
-				win.webContents.send("redirect-url",n);
-			},10);
-			e.preventDefault();
-		}
+		if(!w)return;
+		setTimeout(()=>{
+			win.webContents.send("redirect-url",n);
+		},10);
+		e.preventDefault();
 	});
 	win.webContents.on("new-window",(e,url)=>{
 		e.preventDefault();
 		shell.openExternal(url);
 	});
+	win.loadURL("https://tweetdeck.twitter.com/");
 });
 
 app.on("window-all-closed",()=>{
