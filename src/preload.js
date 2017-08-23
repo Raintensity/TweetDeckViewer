@@ -2,6 +2,9 @@ const electron=require("electron");
 const {ipcRenderer,remote,clipboard,shell}=electron;
 const {Menu,MenuItem}=remote;
 
+const remoteWindow=remote.getCurrentWindow();
+const remoteWeb=remote.getCurrentWebContents();
+
 ipcRenderer.on("redirect-url",(e,url)=>{
     window.location.assign(url);
 });
@@ -22,10 +25,11 @@ window.addEventListener("contextmenu",e=>{
 	}
 	menu.append(new MenuItem({label:"再読み込み (&R)",role:"reload",accelerator:"F5"}));
 	menu.append(new MenuItem({label:"コンソール (&C)",role:"toggledevtools"}));
-	menu.popup(remote.getCurrentWindow());
+	menu.popup(remoteWindow);
 });
 
 window.addEventListener("DOMContentLoaded",()=>{
+	remoteWeb.insertCSS("::-webkit-scrollbar{width:4px!important;height:4px!important;}");
 	var observer=new MutationObserver(recs=>{
 		recs.forEach(rec=>{
 			rec.addedNodes.forEach(node=>{
@@ -44,6 +48,6 @@ window.addEventListener("DOMContentLoaded",()=>{
 window.addEventListener("keydown",e=>{
 	if(e.keyCode!=116)return;
 	e.preventDefault();
-	if(e.ctrlKey)ipcRenderer.send("reload-super");
-	else ipcRenderer.send("reload-normal");
+	if(e.ctrlKey)remoteWeb.reloadIgnoringCache();
+	else remoteWeb.reload();
 });
