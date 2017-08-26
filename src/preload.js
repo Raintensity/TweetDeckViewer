@@ -14,14 +14,23 @@ ipcRenderer.on("redirect-url",(e,url)=>{
 window.addEventListener("contextmenu",e=>{
 	e.preventDefault();
 	var menu=new Menu();
-	if(e.target.tagName=="A"&&e.target.href){
-		menu.append(new MenuItem({label:"ブラウザで開く (&B)",click(){shell.openExternal(e.target.href);}}));
-		menu.append(new MenuItem({label:"リンクアドレスをコピー (&E)",click(){clipboard.writeText(e.target.href);}}));
+	var target=null;
+	for(var i=0;i<e.path.length;i++){
+		if(e.path[i].tagName=="A"&&e.path[i].href){
+			target=e.path[i];
+			break;
+		}
+	}
+	if(target){
+		menu.append(new MenuItem({label:"ブラウザで開く (&B)",click(){shell.openExternal(target.href);}}));
+		menu.append(new MenuItem({label:"リンクアドレスをコピー (&E)",click(){clipboard.writeText(target.href);}}));
 		menu.append(new MenuItem({type:"separator"}));
 	}
+	
 	var str=window.getSelection().toString().replace(/^\s+|\s+$/g,"").replace(/ +/g," ");
 	var t=(((e.target.tagName=="INPUT"&&inputAttr.indexOf(e.target.type)>=0)||e.target.tagName=="TEXTAREA")&&!e.target.disabled);
 	var prohibited=e.target.tagName=="INPUT"&&e.target.type=="password";
+	if(t&&str&&!prohibited)menu.append(new MenuItem({label:"カット (&T)",role:"cut",accelerator:"CommandOrControl+X"}));
 	if(str&&!prohibited)menu.append(new MenuItem({label:"コピー (&C)",role:"copy",accelerator:"CommandOrControl+C"}));
 	if(t)menu.append(new MenuItem({label:"貼り付け (&P)",role:"paste",accelerator:"CommandOrControl+V"}));
 	if(str&&!prohibited)menu.append(new MenuItem({label:"\""+str+"\" をWeb検索 (&S)",click(){shell.openExternal("https://www.google.co.jp/search?q="+encodeURIComponent(str));}}));
