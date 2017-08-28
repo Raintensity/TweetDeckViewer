@@ -16,7 +16,7 @@ window.addEventListener("contextmenu",e=>{
 	var menu=new Menu();
 	var target=null;
 	for(var i=0;i<e.path.length;i++){
-		if(e.path[i].tagName=="A"&&e.path[i].href){
+		if(e.path[i].tagName=="A"&&e.path[i].href&&e.path[i].getAttribute("href")!="#"){
 			target=e.path[i];
 			break;
 		}
